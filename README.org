@@ -6,5 +6,4 @@ Emacs comint mode for NLM's MetaMap. This is also an excuse to learn how to writ
 See this tutorial: http://www.masteringemacs.org/articles/2013/07/31/comint-writing-command-interpreter/
 
 * Tasks
-** TODO Add hook to include additional trailing '\n'
-** TODO Add xml folding for output
+See [[file:metamap.org::*Tasks][metamap.org::Tasks]]

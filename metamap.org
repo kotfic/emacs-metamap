@@ -1,7 +1,13 @@
+* Tasks
+** TODO Add hook to include additional trailing '\n'
+* Header
+#+BEGIN_SRC emacs-lisp :tangle metamap-mode.el
 ;; http://www.masteringemacs.org/articles/2013/07/31/comint-writing-command-interpreter/
+#+END_SRC
 
-
-(defvar metamap-cli-file-path "/mnt/public_mm/bin/metamap12 "
+* Defvars
+#+BEGIN_SRC emacs-lisp :tangle metamap-mode.el 
+(defvar metamap-cli-file-path "/mnt/public_mm/bin/metamap12"
   "Path to the program used by `run-metamap'")
 
 (defvar metamap-cli-arguments '("--XMLf")
@@ -10,13 +16,17 @@
 (defvar metamap-mode-map
   (let ((map (nconc (make-sparse-keymap) comint-mode-map)))
     ;; example definition
-    (define-key map "\t" 'completion-at-point)
+    (define-key map (kbd "<tab>") 'metamap/toggle-element)
     map)
   "Basic mode map for `run-metamap'")
 
 (defvar metamap-prompt-regexp "^\\(|:\\)"
   "Prompt for `run-metamap'.")
+#+END_SRC
 
+* Global function
+
+#+BEGIN_SRC emacs-lisp :tangle metamap-mode.el
 (defun run-metamap ()
   "Run an inferior instance of `cassandra-cli' inside Emacs."
   (interactive)
@@ -40,7 +50,10 @@
   "Helper function to initialize Cassandra"
   (setq comint-process-echoes t)
   (setq comint-use-prompt-regexp t))
+#+END_SRC
 
+* Major Mode Definition
+#+BEGIN_SRC emacs-lisp :tangle metamap-mode.el
 (define-derived-mode metamap-mode comint-mode "Metamap"
   "Major mode for `run-metamap'.
 
@@ -69,5 +82,36 @@
    `(,(concat "\\_<" (regexp-opt metamap-keywords) "\\_>") . font-lock-keyword-face))
   "Additional expressions to highlight in `metamap-mode'.")
 
+#+END_SRC
+
+* Hiding XML elements
+#+BEGIN_SRC emacs-lisp :tangle metamap-mode.el
+(defun metamap/toggle-element ()
+  (interactive)
+  (save-excursion 
+    (let* ((end (progn (sgml-skip-tag-forward 1) (point)))
+	   (start (progn (sgml-skip-tag-backward 1) (point)))
+	   (eol (progn (move-end-of-line 1) (point)))
+	   (ol-list (overlays-in start eol)))
+      (if (> (length ol-list) 0)
+	  ; if there is an overlay,  remove it
+	  (delete-overlay (car ol-list))
+	;if no overlay, add it
+	(let ((ol (make-overlay start end (current-buffer) t nil))
+	      (before-text (concat (buffer-substring-no-properties start eol) "..." )))       
+	  (overlay-put ol 'invisible t)
+	  (overlay-put ol 'before-string before-text))))))
+
+#+END_SRC
+** TODO look at nxml functions for better processing than sgml-* functions
+** TODO Get return elements to be collapsed by default at a certain level
+** TODO Does not currently handle elements on the same line gracefully
+Example: 
+  + <Foo>Bar</Foo>
+  + <Foo />
+* Provide library
+#+BEGIN_SRC emacs-lisp :tangle metamap-mode.el
 (provide 'metamap-mode)
+#+END_SRC
+
 
