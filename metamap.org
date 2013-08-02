@@ -24,10 +24,10 @@
   "Prompt for `run-metamap'.")
 #+END_SRC
 
-* Global function
-
+* Functions
+** Initialize/Run
 #+BEGIN_SRC emacs-lisp :tangle metamap-mode.el
-(defun run-metamap ()
+(defun metamap ()
   "Run an inferior instance of `cassandra-cli' inside Emacs."
   (interactive)
   (let* ((metamap-program metamap-cli-file-path)
@@ -51,6 +51,14 @@
   (setq comint-process-echoes t)
   (setq comint-use-prompt-regexp t))
 #+END_SRC
+** Utility functions
+#+BEGIN_SRC emacs-lisp :tangle metamap-mode.el
+(defun metamap/double-newline (input)
+  (let ((string input))
+    (while (s-ends-with? "\n" string)
+      (setq string (s-chomp string)))
+    (concat string "\n\n")))
+#+END_SRC
 
 * Major Mode Definition
 #+BEGIN_SRC emacs-lisp :tangle metamap-mode.el
@@ -67,14 +75,20 @@
   ;; this makes it so commands like M-{ and M-} work.
   (set (make-local-variable 'paragraph-separate) "^\n")
   (set (make-local-variable 'font-lock-defaults) '(metamap-font-lock-keywords t))
-  (set (make-local-variable 'paragraph-start) metamap-prompt-regexp))
+  (set (make-local-variable 'paragraph-start) metamap-prompt-regexp)
+
+  ; (add-to-list 'comint-input-filter-functions 'metamap/double-newline)
+  
+  )
 
 ;; this has to be done in a hook. grumble grumble.
 (add-hook 'metamap-mode-hook 'metamap--initialize)
-
-
+#+END_SRC
+* Fontlocking
+#+BEGIN_SRC emacs-lisp :tangle metamap-mode.el
+; temporary example
 (defconst metamap-keywords
-  '("MMOS"))
+  '("<MMOs>" "</MMOs>"))
 
 (defvar metamap-font-lock-keywords
   (list
@@ -83,7 +97,7 @@
   "Additional expressions to highlight in `metamap-mode'.")
 
 #+END_SRC
-
+** TODO Add Better fontlocking support for phrases, CUI etc
 * Hiding XML elements
 #+BEGIN_SRC emacs-lisp :tangle metamap-mode.el
 (defun metamap/toggle-element ()

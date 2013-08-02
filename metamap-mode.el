@@ -17,7 +17,7 @@
 (defvar metamap-prompt-regexp "^\\(|:\\)"
   "Prompt for `run-metamap'.")
 
-(defun run-metamap ()
+(defun metamap ()
   "Run an inferior instance of `cassandra-cli' inside Emacs."
   (interactive)
   (let* ((metamap-program metamap-cli-file-path)
@@ -41,6 +41,12 @@
   (setq comint-process-echoes t)
   (setq comint-use-prompt-regexp t))
 
+(defun metamap/double-newline (input)
+  (let ((string input))
+    (while (s-ends-with? "\n" string)
+      (setq string (s-chomp string)))
+    (concat string "\n\n")))
+
 (define-derived-mode metamap-mode comint-mode "Metamap"
   "Major mode for `run-metamap'.
 
@@ -54,14 +60,17 @@
   ;; this makes it so commands like M-{ and M-} work.
   (set (make-local-variable 'paragraph-separate) "^\n")
   (set (make-local-variable 'font-lock-defaults) '(metamap-font-lock-keywords t))
-  (set (make-local-variable 'paragraph-start) metamap-prompt-regexp))
+  (set (make-local-variable 'paragraph-start) metamap-prompt-regexp)
+
+  ; (add-to-list 'comint-input-filter-functions 'metamap/double-newline)
+  
+  )
 
 ;; this has to be done in a hook. grumble grumble.
 (add-hook 'metamap-mode-hook 'metamap--initialize)
 
-
 (defconst metamap-keywords
-  '("MMOS"))
+  '("<MMOs>" "</MMOs>"))
 
 (defvar metamap-font-lock-keywords
   (list
