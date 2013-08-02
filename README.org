@@ -1,0 +1,10 @@
+#+TITLE: Emacs Metamap mode
+#+AUTHOR: Christopher Kotfila
+
+* Notes
+Emacs comint mode for NLM's MetaMap. This is also an excuse to learn how to write a comint mode for emacs.
+See this tutorial: http://www.masteringemacs.org/articles/2013/07/31/comint-writing-command-interpreter/
+
+* Tasks
+** TODO Add hook to include additional trailing '\n'
+** TODO Add xml folding for output
