@@ -1,5 +1,6 @@
-
 ;; http://www.masteringemacs.org/articles/2013/07/31/comint-writing-command-interpreter/
+
+(require 's)
 
 (defvar metamap-cli-file-path "/mnt/public_mm/bin/metamap12"
   "Path to the program used by `run-metamap'")
